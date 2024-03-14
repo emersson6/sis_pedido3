@@ -334,7 +334,7 @@ return [
                 ],
                 [
                     'text' => 'Agregar Cliente',
-                    'url'  => 'clientes/agregar',
+                    'url'  => 'clientes/create',
                     'icon' => 'fas fa-user-plus',
                 ],
             ],

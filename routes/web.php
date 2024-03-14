@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductoController;
+use App\Http\Controllers\ClienteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,6 +32,10 @@ Route::middleware('auth')->group(function () {
     Route::get('productos/import', [ProductoController::class, 'showImportForm'])->name('productos.import.form');
     Route::post('productos/import', [ProductoController::class, 'import'])->name('productos.import');
     Route::resource('productos', ProductoController::class);
+    Route::resource('clientes', ClienteController::class);
+    Route::get('/clientes/{cliente}/edit', [ClienteController::class, 'edit'])->name('clientes.edit');
+
+
 
 
 
