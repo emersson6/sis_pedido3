@@ -1,19 +1,15 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\DireccionController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
 */
 
 Route::get('/', function () {
@@ -33,12 +29,15 @@ Route::middleware('auth')->group(function () {
     Route::post('productos/import', [ProductoController::class, 'import'])->name('productos.import');
     Route::resource('productos', ProductoController::class);
     Route::resource('clientes', ClienteController::class);
-    Route::get('/clientes/{cliente}/edit', [ClienteController::class, 'edit'])->name('clientes.edit');
+    Route::get('clientes/{cliente}', [ClienteController::class, 'show'])->name('clientes.show');
 
 
-
-
-
+    // Rutas para direcciones de clientes
+    Route::post('/clientes/{cliente_id}/direcciones', [DireccionController::class, 'store'])->name('direcciones.store');
+    Route::get('/direcciones/{id}/edit', [DireccionController::class, 'edit'])->name('direcciones.edit');
+    Route::put('/direcciones/{id}', [DireccionController::class, 'update'])->name('direcciones.update');
+    Route::delete('/direcciones/{id}', [DireccionController::class, 'destroy'])->name('direcciones.destroy');
+    Route::get('/clientes/{cliente_id}/direcciones/create', 'DireccionController@create')->name('direcciones.create');
 });
 
 require __DIR__.'/auth.php';

@@ -76,10 +76,16 @@ class ClienteController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show($id)
     {
-        //
+        $cliente = Cliente::findOrFail($id);
+        // Asume que ya tienes una relación definida para 'direcciones' en tu modelo Cliente
+        $ubicaciones = Ubicacion::all(); // Para el select de ubicaciones en la vista
+
+        return view('clientes.show', compact('cliente', 'ubicaciones'));
     }
+
+
 
     /**
      * Show the form for editing the specified resource.

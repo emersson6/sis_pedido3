@@ -23,13 +23,9 @@ class Cliente extends Model
         'canal_venta',
     ];
 
+
     public function direcciones()
     {
         return $this->hasMany(Direccion::class);
-    }
-
-    public function ubicacion()
-    {
-        return $this->belongsTo(Ubicacion::class);
     }
 }
