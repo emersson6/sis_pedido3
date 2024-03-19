@@ -10,6 +10,14 @@ class Direccion extends Model
     use HasFactory;
 
     protected $table = 'direcciones'; // Asegúrate de que este nombre coincida con el nombre de tu tabla
+    protected $fillable = [
+        'cliente_id',
+        'tipo',
+        'direccion',
+        'ubicacion_id',
+    ];
+
+
 
     public function cliente()
     {

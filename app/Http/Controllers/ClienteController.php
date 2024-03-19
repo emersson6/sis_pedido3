@@ -146,4 +146,22 @@ class ClienteController extends Controller
     {
         //
     }
+
+    // En ClienteController
+
+    public function getClienteInfo(Request $request, $id)
+    {
+        $cliente = Cliente::with('direcciones')->findOrFail($id);
+        return response()->json($cliente);
+    }
+
+    public function info($clienteId)
+    {
+        // Busca el cliente por su ID y carga sus direcciones y la ubicación de cada dirección
+        $cliente = Cliente::with(['direcciones.ubicacion'])->findOrFail($clienteId);
+
+        // Devuelve los datos del cliente en formato JSON
+        return response()->json($cliente);
+    }
+
 }

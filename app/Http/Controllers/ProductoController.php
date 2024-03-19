@@ -85,6 +85,14 @@ class ProductoController extends Controller
         return redirect()->route('productos.index')
                          ->with('success', 'Productos cargados exitosamente.');
     }
+    // Dentro de ProductoController.php
+    public function info($productoId)
+    {
+        $producto = Producto::findOrFail($productoId);
+        return response()->json($producto);
+    }
+
+
 
 
 

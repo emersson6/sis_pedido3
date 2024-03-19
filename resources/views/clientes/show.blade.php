@@ -61,30 +61,28 @@
                 @endif
             </div>
         </div>
-
-
-
-
-        <form action="{{ route('direcciones.store', $cliente->id) }}" method="POST">
+        <form action="{{ route('direcciones.store') }}" method="POST">
             @csrf
+            <!-- Asegúrate de incluir cliente_id como un campo oculto en tu formulario -->
+            <input type="hidden" name="cliente_id" value="{{ $cliente->id }}">
+
             <div class="form-group">
                 <label for="tipo">Tipo de Dirección:</label>
-                <input type="text" name="tipo" id="tipo" class="form-control" placeholder="Ejemplo: Oficina, Casa, Sucursal">
+                <input type="text" name="tipo" id="tipo" class="form-control" required>
             </div>
             <div class="form-group">
                 <label for="direccion">Dirección:</label>
-                <input type="text" name="direccion" id="direccion" class="form-control" placeholder="Ingresa la dirección completa">
+                <input type="text" name="direccion" id="direccion" class="form-control" required>
             </div>
             <div class="form-group">
                 <label for="ubicacion_id">Ubicación:</label>
-                <select name="ubicacion_id" id="ubicacion_id" class="form-control">
-                    {{-- Suponiendo que tienes las ubicaciones pasadas a la vista --}}
-                    @foreach($ubicaciones as $ubicacion)
-                    <option value="{{ $ubicacion->id }}">{{ $ubicacion->comuna }}, {{ $ubicacion->region }}</option>
+                <select name="ubicacion_id" id="ubicacion_id" class="form-control" required>
+                    @foreach ($ubicaciones as $ubicacion)
+                        <option value="{{ $ubicacion->id }}">{{ $ubicacion->comuna }}, {{ $ubicacion->region }}</option>
                     @endforeach
                 </select>
             </div>
-            <button type="submit" class="btn btn-success">Agregar Dirección</button>
+            <button type="submit" class="btn btn-primary">Agregar Dirección</button>
         </form>
     </div>
 </div>

@@ -345,7 +345,7 @@ return [
             'submenu' => [
                 [
                     'text' => 'Crear Pedido',
-                    'url'  => 'pedidos/crear',
+                    'url'  => 'pedidos/create',
                     'icon' => 'fas fa-plus',
                 ],
                 [
