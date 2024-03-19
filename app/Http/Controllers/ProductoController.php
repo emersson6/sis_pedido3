@@ -92,7 +92,18 @@ class ProductoController extends Controller
         return response()->json($producto);
     }
 
+    public function buscador(Request $request)
+    {
+        $term = $request->input('term');
+        // Ajusta las consultas según tus modelos y estructura de base de datos.
+        $productos = Producto::where('nombre', 'LIKE', '%' . $term . '%')
+                        ->orWhereHas('marca', function($query) use ($term) {
+                            $query->where('nombre', 'LIKE', '%' . $term . '%');
+                        })
+                        ->get(['id', 'nombre as text']); // Ajusta los campos según sea necesario
 
+        return response()->json($productos);
+    }
 
 
 

@@ -59,12 +59,12 @@ class DireccionController extends Controller
         public function destroy($id)
         {
             $direccion = Direccion::findOrFail($id);
-            $cliente_id = $direccion->cliente_id;
+            $clienteId = $direccion->cliente_id;
             $direccion->delete();
 
-            return redirect()->route('clientes.show', $cliente_id)
-                             ->with('success', 'Dirección eliminada con éxito.');
+            return redirect()->route('clientes.show', $clienteId)->with('success', 'Dirección eliminada con éxito.');
         }
+
 
         public function storeAjax(Request $request)
         {

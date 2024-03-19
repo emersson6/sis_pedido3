@@ -35,30 +35,35 @@
                 Direcciones del Cliente
             </div>
             <div class="card-body">
-                @if($cliente->direcciones->isEmpty())
-                    <p>Este cliente no tiene direcciones adicionales.</p>
-                @else
-                    <table class="table">
-                        <thead>
+                @if(!$cliente->direcciones->isEmpty())
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Dirección</th>
+                            <th>Ubicación</th>
+                            <th>Acciones</th> {{-- Agregar encabezado para la columna de acciones --}}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($cliente->direcciones as $direccion)
                             <tr>
-                                <th>Tipo</th>
-                                <th>Dirección</th>
-                                <th>Ubicación</th>
-                                {{-- Agrega más columnas si necesitas --}}
+                                <td>{{ $direccion->tipo }}</td>
+                                <td>{{ $direccion->direccion }}</td>
+                                <td>{{ $direccion->ubicacion->comuna }}, {{ $direccion->ubicacion->region }}</td>
+                                <td>
+                                    {{-- Formulario para eliminar dirección --}}
+                                    <form action="{{ route('direcciones.destroy', $direccion->id) }}" method="POST" onsubmit="return confirm('¿Está seguro de que desea eliminar esta dirección?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                                    </form>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($cliente->direcciones as $direccion)
-                                <tr>
-                                    <td>{{ $direccion->tipo }}</td>
-                                    <td>{{ $direccion->direccion }}</td>
-                                    <td>{{ $direccion->ubicacion->comuna }}, {{ $direccion->ubicacion->region }}</td>
-                                    {{-- Más columnas si agregaste más campos en la tabla direcciones --}}
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                @endif
+                        @endforeach
+                    </tbody>
+                </table>
+            @endif
             </div>
         </div>
         <form action="{{ route('direcciones.store') }}" method="POST">

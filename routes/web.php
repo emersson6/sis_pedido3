@@ -6,6 +6,7 @@ use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\DireccionController;
 use App\Http\Controllers\PedidoController; // Asegúrate de importar el controlador de pedidos aquí
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,6 +50,11 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/productos/info/{producto}', [ProductoController::class, 'info'])->name('productos.info');
     Route::post('/pedidos/cambiar-estado/{pedido}', [PedidoController::class, 'cambiarEstado'])->name('pedidos.cambiarEstado');
+
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('/productos/buscador', [ProductoController::class, 'buscador']);
+
 
 
 });
