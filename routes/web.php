@@ -44,7 +44,7 @@ Route::middleware('auth')->group(function () {
     // Rutas para pedidos
     Route::resource('pedidos', PedidoController::class);
     Route::get('/clientes/info/{cliente}', [ClienteController::class, 'info'])->name('clientes.info');
-    Route::post('/direcciones/store', [DireccionController::class, 'store']);
+    //Route::post('/direcciones/store', [DireccionController::class, 'store']);
     Route::post('/direcciones/ajax/store', [DireccionController::class, 'storeAjax'])->name('direcciones.ajax.store');
     Route::post('/direcciones/store', [DireccionController::class, 'store'])->name('direcciones.store');
 

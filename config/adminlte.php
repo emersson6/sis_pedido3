@@ -296,7 +296,7 @@ return [
     'menu' => [
         [
             'text' => 'Dashboard',
-            'url'  => 'home',
+            'url'  => 'dashboard',
             'icon' => 'fas fa-tachometer-alt',
         ],
         [
