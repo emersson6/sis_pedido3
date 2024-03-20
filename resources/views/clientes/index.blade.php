@@ -55,14 +55,22 @@
 </div>
 @endsection
 
+@section('css')
+<link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
+
+@stop
+
+
 @section('js')
 <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
 <script>
-$(document).ready( function () {
+$(document).ready(function() {
     $('#clientesTable').DataTable({
         "language": {
             "url": "//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json"
-        }
+        },
+        "ordering": true, // Habilita el ordenamiento de columnas
+        "searching": true // Habilita la búsqueda global en la tabla
     });
 });
 </script>

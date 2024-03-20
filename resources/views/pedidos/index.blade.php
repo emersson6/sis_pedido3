@@ -12,7 +12,7 @@
         <h3 class="card-title">Pedidos Registrados</h3>
     </div>
     <div class="card-body">
-        <table class="table table-bordered table-striped">
+        <table class="table table-bordered table-striped" id="pedidosTable">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -43,16 +43,28 @@
                         <a href="{{ route('pedidos.show', $pedido->id) }}" class="btn btn-info">Ver Pedido</a>
                     </td>
                 </tr>
-            @endforeach
+                @endforeach
             </tbody>
         </table>
     </div>
 </div>
 @stop
+
+@push('css')
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
+@endpush
+
 @push('js')
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
 <script>
 $(document).ready(function() {
+    $('#pedidosTable').DataTable({
+        "language": {
+            "url": "//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json"
+        }
+    });
+
     $('.change-status').change(function() {
         var pedidoId = $(this).data('pedido-id');
         var estado = $(this).val();

@@ -18,7 +18,7 @@
             @csrf
             <div class="row">
                 <!-- Columna izquierda -->
-                <div class="col-md-6">
+                <div class="col-md-12">
                     <div class="form-group">
                         <label for="cliente_id">Cliente:</label>
                         <select class="form-control" id="cliente_id" name="cliente_id" onchange="cargarCliente()">
@@ -65,8 +65,7 @@
                         </select>
                     </div>
                 </div>
-                <!-- Columna derecha -->
-                <div class="col-md-6">
+                <div class="col-md-12">
                     <div class="form-group">
                         <label for="fecha_pedido">Fecha del Pedido:</label>
                         <input type="date" class="form-control" id="fecha_pedido" name="fecha_pedido" value="{{ now()->toDateString() }}" readonly>
@@ -123,7 +122,6 @@
                         </table>
                     </div>
                 </div>
-
                 <div class="row mt-4">
                     <!-- Total de Cajas -->
                     <div class="col-md-3">
@@ -135,7 +133,6 @@
                             </div>
                         </div>
                     </div>
-
                     <!-- Monto Neto Total -->
                     <div class="col-md-3">
                         <div class="card text-center">
@@ -146,7 +143,6 @@
                             </div>
                         </div>
                     </div>
-
                     <!-- Peso Total -->
                     <div class="col-md-3">
                         <div class="card text-center">
@@ -157,7 +153,6 @@
                             </div>
                         </div>
                     </div>
-
                     <!-- Costo de Envío Total -->
                     <div class="col-md-3">
                         <div class="card text-center">
@@ -173,7 +168,6 @@
             <button type="submit" class="btn btn-success">Crear Pedido</button>
             </div>
         </form>
-
         <div class="modal fade" id="modalExito" tabindex="-1" aria-labelledby="modalExitoLabel" aria-hidden="true">
             <div class="modal-dialog">
               <div class="modal-content">
@@ -189,11 +183,31 @@
                 </div>
               </div>
             </div>
-          </div>
+        </div>
+@stop
+
+@section('css')
+    <!-- Incluir el CSS de Select2 -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
 @stop
 
 @section('js')
+
+    <!-- Incluir el JS de Select2 -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
+
     <script>
+        $(document).ready(function() {
+            // Inicializar Select2
+            $('#cliente_id').select2();
+            $('#tipo_pedido').select2();
+            $('#producto_id').select2();
+            // Asegúrate de inicializar todos los elementos select que necesites
+        });
+
+
+
+
     function toggleNuevaDireccion() {
         var x = document.getElementById("nuevaDireccion");
         if (x.style.display === "none") {
@@ -214,17 +228,30 @@
         .then(data => {
             const infoClienteDiv = document.getElementById('infoCliente');
             let htmlContent = `
-                <h3>Información del Cliente</h3>
-                <p><strong>Nombre:</strong> ${data.nombre}</p>
-                <p><strong>RUT:</strong> ${data.rut}</p>
-                <p><strong>Fono:</strong> ${data.fono}</p>
-                <p><strong>Contacto:</strong> ${data.nombre_contacto} / ${data.fono_contacto}</p>
-                <p><strong>Dirección Matriz:</strong> ${data.direccion_matriz}</p>
-                <h4>Direcciones de Envío</h4>
-                <select class="form-control" id="direccionEnvio" name="direccionEnvio">`;
-                    data.direcciones.forEach(direccion => {
-                        htmlContent += `<option value="${direccion.id}">${direccion.tipo}: ${direccion.direccion}</option>`;
-                    });htmlContent += `</select>`;
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Información del Cliente</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Nombre:</strong> ${data.nombre}</p>
+                                <p><strong>RUT:</strong> ${data.rut}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Fono:</strong> ${data.fono}</p>
+                                <p><strong>Contacto:</strong> ${data.nombre_contacto} / ${data.fono_contacto}</p>
+                            </div>
+                        </div>
+                        <p><strong>Dirección Matriz:</strong> ${data.direccion_matriz}</p>
+                        <h4>Direcciones de Envío</h4>
+                        <select class="form-control" id="direccionEnvio" name="direccionEnvio">`;
+                            data.direcciones.forEach(direccion => {
+                                htmlContent += `<option value="${direccion.id}">${direccion.tipo}: ${direccion.direccion}</option>`;
+                            });
+                        htmlContent += `</select>
+                    </div>
+                </div>`;
 
             infoClienteDiv.innerHTML = htmlContent;
         })
@@ -336,6 +363,8 @@
         var index = document.querySelectorAll('#resumenPedido tbody tr').length;
         var resumenPedido = document.getElementById('resumenPedido').getElementsByTagName('tbody')[0];
         var nuevaFila = resumenPedido.insertRow();
+
+        nuevaFila.classList.add("table-success"); // Añade una clase para estilizar la fila, puedes cambiarla por la que prefieras
 
         nuevaFila.innerHTML = `
             <td>${productoNombre}<input type="hidden" name="items[${index}][producto_id]" value="${productoId}"></td>
