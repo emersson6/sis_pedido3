@@ -4,7 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\DireccionController;
-use App\Http\Controllers\PedidoController; // Asegúrate de importar el controlador de pedidos aquí
+use App\Http\Controllers\PedidoController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 
@@ -22,10 +22,13 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::middleware('auth')->group(function () {
+    Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/pedidos/descargar', [PedidoController::class, 'descargar'])->name('pedidos.descargar');
+
 
     Route::get('productos/import', [ProductoController::class, 'showImportForm'])->name('productos.import.form');
     Route::post('productos/import', [ProductoController::class, 'import'])->name('productos.import');

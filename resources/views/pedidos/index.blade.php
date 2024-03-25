@@ -11,6 +11,12 @@
     <div class="card-header">
         <h3 class="card-title">Pedidos Registrados</h3>
     </div>
+    <div class="card-tools">
+        <!-- Botón para descargar pedidos -->
+        <a href="{{ route('pedidos.descargar') }}" class="btn btn-success">
+            Descargar Pedidos
+        </a>
+    </div>
     <div class="card-body">
         <table class="table table-bordered table-striped" id="pedidosTable">
             <thead>
@@ -33,7 +39,7 @@
                     <td>{{ $pedido->fecha_pedido }}</td>
                     <td>{{ $pedido->orden_compra }}</td>
                     <td>
-                        <select class="form-control change-status" data-pedido-id="{{ $pedido->id }}">
+                        <select class="form-control change-status" data-pedido-id="{{ $pedido->id }}" data-url-base="{{ route('pedidos.cambiarEstado', '_id_') }}">
                             <option value="pendiente" {{ $pedido->estado == 'pendiente' ? 'selected' : '' }}>Pendiente</option>
                             <option value="completado" {{ $pedido->estado == 'completado' ? 'selected' : '' }}>Completado</option>
                             <option value="cancelado" {{ $pedido->estado == 'cancelado' ? 'selected' : '' }}>Cancelado</option>
@@ -66,23 +72,25 @@ $(document).ready(function() {
     });
 
     $('.change-status').change(function() {
-        var pedidoId = $(this).data('pedido-id');
-        var estado = $(this).val();
-        $.ajax({
-            url: "{{ url('/pedidos/cambiar-estado') }}/" + pedidoId,
-            method: 'POST',
-            data: {
-                estado: estado,
-                _token: "{{ csrf_token() }}"
-            },
-            success: function(result) {
-                alert('Estado actualizado con éxito');
-            },
-            error: function(request, status, error) {
-                alert('Error al actualizar el estado');
-            }
-        });
+    var pedidoId = $(this).data('pedido-id');
+    var status = $(this).val(); // Cambiar 'estado' por 'status'
+    $.ajax({
+        url: "{{ route('pedidos.cambiarEstado', '') }}/" + pedidoId,
+        method: 'POST',
+        data: {
+            status: status, // Cambiar 'estado' por 'status'
+            _token: "{{ csrf_token() }}"
+        },
+        success: function(result) {
+            alert('Estado actualizado con éxito');
+        },
+        error: function(request, status, error) {
+            alert('Error al actualizar el estado');
+        }
     });
+});
+
+
 });
 </script>
 @endpush

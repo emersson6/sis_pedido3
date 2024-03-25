@@ -9,6 +9,9 @@ use Illuminate\Http\Request;
 use App\Models\Ubicacion;
 use App\Models\Producto;
 use App\Models\ItemPedido;
+use Illuminate\Support\Facades\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Carbon\Carbon;
 
 use Illuminate\Support\Facades\DB;
 
@@ -97,15 +100,77 @@ class PedidoController extends Controller
 
     public function cambiarEstado(Request $request, $pedidoId)
     {
-        $pedido = Pedido::find($pedidoId);
-        if ($pedido) {
-            $pedido->estado = $request->estado;
-            $pedido->save();
-            return response()->json(['success' => 'Estado actualizado correctamente.']);
-        }
+        $request->validate([
+            'status' => 'required|in:pendiente,completado,cancelado', // Asegúrate de validar contra los estados posibles
+        ]);
 
-        return response()->json(['error' => 'Pedido no encontrado.'], 404);
+        $pedido = Pedido::findOrFail($pedidoId);
+        $pedido->status = $request->status; // Usar 'status' en lugar de 'estado'
+        $pedido->save();
+
+        return response()->json(['message' => 'Estado actualizado con éxito']);
     }
+
+
+
+    public function descargar(): StreamedResponse
+    {
+        // Definir los encabezados para el archivo CSV
+        $headers = array(
+            "Content-type" => "text/csv",
+            "Content-Disposition" => "attachment; filename=pedidos.csv",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0"
+        );
+
+        $callback = function() {
+            $file = fopen('php://output', 'w');
+
+            // Escribir la cabecera del CSV con detalles adicionales
+            fputcsv($file, [
+                'ID Pedido',
+                'Cliente',
+                'Dirección',
+                'Fecha del Pedido',
+                'Orden de Compra',
+                'Estado',
+                'Producto',
+                'Cantidad',
+                'Precio Neto'
+            ]);
+
+            // Obtener todos los pedidos con sus detalles
+            $pedidos = Pedido::with(['cliente', 'direccion', 'items.producto'])->get();
+
+            foreach ($pedidos as $pedido) {
+                // Para cada pedido, recorrer sus ítems
+                foreach ($pedido->items as $item) {
+                    fputcsv($file, [
+                        $pedido->id,
+                        $pedido->cliente->nombre,
+                        $pedido->direccion->direccion,
+                        $pedido->fecha_pedido,
+                        $pedido->orden_compra,
+                        $pedido->status,
+                        $item->producto->nombre, // Asegúrate de que el modelo 'Producto' tenga un atributo 'nombre'
+                        $item->cantidad,
+                        $item->precio_neto,
+                    ]);
+                }
+            }
+
+            fclose($file);
+        };
+
+        return Response::stream($callback, 200, $headers);
+    }
+
+
+
+
+
+
 
 
     // Añade aquí los demás métodos que necesites, como show, edit, update, destroy
