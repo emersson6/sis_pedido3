@@ -10,13 +10,14 @@
 <div class="card">
     <div class="card-header">
         <h3 class="card-title">Pedidos Registrados</h3>
+
     </div>
-    <div class="card-tools">
-        <!-- Botón para descargar pedidos -->
-        <a href="{{ route('pedidos.descargar') }}" class="btn btn-success">
-            Descargar Pedidos
-        </a>
-    </div>
+            <div class="card-tools">
+            <!-- Botón para descargar pedidos -->
+            <div class="card-body"><a href="{{ route('pedidos.descargar') }}" class="btn btn-success">
+                Descargar Pedidos
+            </a></div>
+        </div>
     <div class="card-body">
         <table class="table table-bordered table-striped" id="pedidosTable">
             <thead>
@@ -40,10 +41,11 @@
                     <td>{{ $pedido->orden_compra }}</td>
                     <td>
                         <select class="form-control change-status" data-pedido-id="{{ $pedido->id }}" data-url-base="{{ route('pedidos.cambiarEstado', '_id_') }}">
-                            <option value="pendiente" {{ $pedido->estado == 'pendiente' ? 'selected' : '' }}>Pendiente</option>
-                            <option value="completado" {{ $pedido->estado == 'completado' ? 'selected' : '' }}>Completado</option>
-                            <option value="cancelado" {{ $pedido->estado == 'cancelado' ? 'selected' : '' }}>Cancelado</option>
+                            <option value="pendiente" {{ $pedido->status == 'pendiente' ? 'selected' : '' }}>Pendiente</option>
+                            <option value="completado" {{ $pedido->status == 'completado' ? 'selected' : '' }}>Completado</option>
+                            <option value="cancelado" {{ $pedido->status == 'cancelado' ? 'selected' : '' }}>Cancelado</option>
                         </select>
+
                     </td>
                     <td>
                         <a href="{{ route('pedidos.show', $pedido->id) }}" class="btn btn-info">Ver Pedido</a>

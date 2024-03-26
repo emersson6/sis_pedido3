@@ -77,5 +77,8 @@
     <div class="card-footer text-center">
         <a href="{{ route('pedidos.index') }}" class="btn btn-primary">Volver a la lista de pedidos</a>
     </div>
+    <div class="card-footer text-center">
+        <a href="{{ route('pedidos.pdf', $pedido->id) }}" class="btn btn-success">Descargar PDF</a>
+    </div>
 </div>
 @stop

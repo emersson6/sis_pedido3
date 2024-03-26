@@ -124,7 +124,7 @@
                 </div>
                 <div class="row mt-4">
                     <!-- Total de Cajas -->
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <div class="card text-center">
                             <div class="card-body">
                                 <i class="fa fa-boxes fa-2x"></i>
@@ -143,8 +143,18 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Peso Total -->
+                    <!-- Valor Bruto -->
                     <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <i class="fa fa-money-bill-wave fa-2x"></i>
+                                <h5>Valor Bruto</h5>
+                                <p id="valorBrutoTotal">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Peso Total -->
+                    <div class="col-md-2">
                         <div class="card text-center">
                             <div class="card-body">
                                 <i class="fa fa-weight-hanging fa-2x"></i>
@@ -154,7 +164,7 @@
                         </div>
                     </div>
                     <!-- Costo de Envío Total -->
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <div class="card text-center">
                             <div class="card-body">
                                 <i class="fa fa-truck fa-2x"></i>
@@ -195,7 +205,6 @@
 
     <!-- Incluir el JS de Select2 -->
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
-
     <script>
         $(document).ready(function() {
             // Inicializar Select2
@@ -204,9 +213,6 @@
             $('#producto_id').select2();
             // Asegúrate de inicializar todos los elementos select que necesites
         });
-
-
-
 
     function toggleNuevaDireccion() {
         var x = document.getElementById("nuevaDireccion");
@@ -316,36 +322,47 @@
         .then(response => response.json())
         .then(data => {
             const infoDiv = document.getElementById('infoProducto');
-            // Asumiendo que data.peso proporciona el peso del producto
             let htmlContent = `
                 <p><strong>Código SKU:</strong> ${data.codigo_sku}</p>
                 <p><strong>Nombre:</strong> ${data.nombre}</p>
                 <p><strong>Stock disponible:</strong> ${data.stock}</p>
-                <p><strong>Peso por unidad:</strong> ${data.peso} kg</p> <!-- Mostrar peso aquí -->
+                <p><strong>Peso por unidad:</strong> ${data.peso} kg</p>
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="form-group">
                             <label for="cantidad_cajas">Cantidad de Cajas:</label>
                             <input type="number" class="form-control" id="cantidad_cajas" name="cantidad_cajas">
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="form-group">
                             <label for="precio_neto">Precio Neto:</label>
-                            <input type="number" class="form-control" id="precio_neto" name="precio_neto" step="0.01">
+                            <input type="number" class="form-control" id="precio_neto" name="precio_neto" step="0.01" onchange="calcularCostoEnvio()">
                         </div>
                     </div>
-                    <div class="form-group">
-                <label for="costo_envio">Costo de Envío:</label>
-                <input type="number" class="form-control" id="costo_envio" name="costo_envio" step="0.01" required>
-            </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="costo_envio">Costo de Envío:</label>
+                            <input type="number" class="form-control" id="costo_envio" name="costo_envio" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="costo_envio_calculado">Costo de Envío (4% de Precio Neto):</label>
+                            <input type="text" class="form-control" id="costo_envio_calculado" name="costo_envio_calculado" readonly>
+                        </div>
+                    </div>
                 </div>
             `;
-            // Guarda el peso por unidad en un lugar accesible, por ejemplo, como un atributo del div infoProducto
             infoDiv.setAttribute('data-peso', data.peso);
 
             infoDiv.innerHTML = htmlContent;
         });
+    }
+    function calcularCostoEnvio() {
+        var precioNeto = parseFloat(document.getElementById('precio_neto').value || 0);
+        var costoEnvioCalculado = precioNeto * 0.04; // Calcula el 4% del precio neto
+        document.getElementById('costo_envio_calculado').value = costoEnvioCalculado.toFixed(2); // Muestra el valor calculado en el campo
     }
     function agregarItemPedido() {
         var productoId = document.getElementById('producto_id').value;
@@ -387,6 +404,7 @@
         // Llama a actualizarResumenPedido para recalcular los totales
         actualizarResumenPedido();
     }
+
     function actualizarResumenPedido() {
         var totalCajas = 0;
         var montoNetoTotal = 0;
@@ -405,11 +423,19 @@
             pesoTotal += peso;
         });
 
+        // Calcula el Valor Bruto
+        var valorBrutoTotal = montoNetoTotal * 1.395;
+
         document.getElementById("totalCajas").textContent = totalCajas;
         document.getElementById("montoNetoTotal").textContent = `$${montoNetoTotal.toFixed(2)}`;
         document.getElementById("costoEnvioTotal").textContent = `$${costoEnvioTotal.toFixed(2)}`;
         document.getElementById("pesoTotal").textContent = `${pesoTotal.toFixed(2)} kg`;
+        // Actualiza el Valor Bruto en la vista
+        document.getElementById("valorBrutoTotal").textContent = `$${valorBrutoTotal.toFixed(2)}`;
     }
+
+
+
     // Llama a actualizarResumenPedido dentro de agregarItemPedido y cualquier otra función que modifique los ítems
     </script>
 @stop

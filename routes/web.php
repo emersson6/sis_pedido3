@@ -37,7 +37,7 @@ Route::get('/dashboard', function () {
     Route::get('clientes/{cliente}', [ClienteController::class, 'show'])->name('clientes.show');
 
     // Rutas para direcciones de clientes
-    Route::post('/clientes/{cliente_id}/direcciones', [DireccionController::class, 'store'])->name('direcciones.store');
+    //Route::post('/clientes/{cliente_id}/direcciones', [DireccionController::class, 'store'])->name('direcciones.store');
 
     Route::get('/direcciones/{id}/edit', [DireccionController::class, 'edit'])->name('direcciones.edit');
     Route::put('/direcciones/{id}', [DireccionController::class, 'update'])->name('direcciones.update');
@@ -47,7 +47,7 @@ Route::get('/dashboard', function () {
     // Rutas para pedidos
     Route::resource('pedidos', PedidoController::class);
     Route::get('/clientes/info/{cliente}', [ClienteController::class, 'info'])->name('clientes.info');
-    //Route::post('/direcciones/store', [DireccionController::class, 'store']);
+    Route::post('/direcciones/store', [DireccionController::class, 'store']);
     Route::post('/direcciones/ajax/store', [DireccionController::class, 'storeAjax'])->name('direcciones.ajax.store');
     Route::post('/direcciones/store', [DireccionController::class, 'store'])->name('direcciones.store');
 
@@ -55,7 +55,7 @@ Route::get('/dashboard', function () {
     Route::post('/pedidos/cambiar-estado/{pedido}', [PedidoController::class, 'cambiarEstado'])->name('pedidos.cambiarEstado');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
+    Route::get('pedidos/{pedido}/pdf', [PedidoController::class, 'descargarPdf'])->name('pedidos.pdf');
     Route::get('/productos/buscador', [ProductoController::class, 'buscador']);
 
 

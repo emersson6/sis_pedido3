@@ -12,6 +12,10 @@ use App\Models\ItemPedido;
 use Illuminate\Support\Facades\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade;
+use PDF;
+
+
 
 use Illuminate\Support\Facades\DB;
 
@@ -28,19 +32,15 @@ class PedidoController extends Controller
         // Asegúrate de pasar la variable $productos a la vista
         return view('pedidos.create', compact('clientes', 'productos', 'ubicaciones'));
     }
-
-
     // Muestra un pedido específico
     public function show($id)
     {
         $pedido = Pedido::with(['cliente', 'direccion', 'items.producto'])->findOrFail($id);
         return view('pedidos.show', compact('pedido'));
     }
-
     // Almacena un nuevo pedido en la base de datos
     public function store(Request $request)
     {
-        /*dd($request->all());*/
         $request->validate([
             'cliente_id' => 'required|exists:clientes,id',
             'direccionEnvio' => 'required|exists:direcciones,id',
@@ -52,45 +52,57 @@ class PedidoController extends Controller
             'items.*.cantidad' => 'required|numeric|min:1',
             'items.*.precio_neto' => 'required|numeric',
             'items.*.costo_envio' => 'required|numeric',
-            // Continúa validando otros campos necesarios aquí
         ]);
 
         DB::beginTransaction();
         try {
             $pedido = new Pedido();
             $pedido->cliente_id = $request->cliente_id;
-            $pedido->direccion_id = $request->direccionEnvio; // Cambiado de 'direccion_id' a 'direccionEnvio', según tu input
-            $pedido->costo_envio = $request->costo_envio;
-            $pedido->comentarios = $request->comentarios ?? '';
+            $pedido->direccion_id = $request->direccionEnvio;
             $pedido->fecha_pedido = $request->fecha_pedido;
-            $pedido->orden_compra = $request->orden_compra ?? '';
+            $pedido->orden_compra = $request->orden_compra;
             $pedido->tipo_pedido = $request->tipo_pedido;
+            $pedido->comentarios = $request->comentarios ?? '';
 
-            // Agrega cualquier otro campo necesario que falte aquí
+            // Calcula el costo de envío total sumando los costos de envío de todos los ítems
+            $costoEnvioTotal = array_sum(array_map(function($item) {
+                return $item['costo_envio'] * $item['cantidad']; // Asegúrate de multiplicar por la cantidad si es necesario
+            }, $request->items));
+            $pedido->costo_envio = $costoEnvioTotal;
+
             $pedido->save();
 
             foreach ($request->items as $itemData) {
-                $subtotal = $itemData['cantidad'] * $itemData['precio_neto']; // Calcula el subtotal aquí
+
+                $producto = Producto::find($itemData['producto_id']);
+                if ($producto->stock < $itemData['cantidad']) {
+                    // Manejar caso donde no hay suficiente stock
+                    throw new \Exception("No hay suficiente stock para el producto con ID: " . $itemData['producto_id']);
+                }
+
+                $producto->stock -= $itemData['cantidad'];
+                $producto->save();
+
+                $subtotal = $itemData['cantidad'] * $itemData['precio_neto']; // Subtotal por ítem
                 $itemPedido = new ItemPedido([
                     'producto_id' => $itemData['producto_id'],
-                    'pedido_id' => $pedido->id, // Asegúrate de asignar el ID del pedido que acabas de crear
+                    'pedido_id' => $pedido->id,
                     'cantidad' => $itemData['cantidad'],
                     'precio_neto' => $itemData['precio_neto'],
                     'subtotal' => $subtotal,
-                    // Agrega otros campos si son necesarios
+                    // Añade el costo de envío por ítem si es necesario
                 ]);
-                // Asegúrate de que 'ItemPedido' es el nombre correcto del modelo que corresponde a la tabla 'item_pedidos'
-                $itemPedido->save(); // Guarda cada ítem individualmente
+                $itemPedido->save();
             }
 
             DB::commit();
             return redirect()->route('pedidos.index')->with('success', 'Pedido creado con éxito.');
         } catch (\Exception $e) {
             DB::rollback();
+            // Si algo sale mal, se devuelve al usuario a la página anterior con el mensaje de error.
             return back()->withErrors(['error' => 'Hubo un error al crear el pedido: ' . $e->getMessage()]);
         }
     }
-
     // Lista todos los pedidos
     public function index()
     {
@@ -110,9 +122,6 @@ class PedidoController extends Controller
 
         return response()->json(['message' => 'Estado actualizado con éxito']);
     }
-
-
-
     public function descargar(): StreamedResponse
     {
         // Definir los encabezados para el archivo CSV
@@ -127,14 +136,20 @@ class PedidoController extends Controller
         $callback = function() {
             $file = fopen('php://output', 'w');
 
+            fputs($file, $bom =( chr(0xEF) . chr(0xBB) . chr(0xBF) ));
+
             // Escribir la cabecera del CSV con detalles adicionales
             fputcsv($file, [
                 'ID Pedido',
                 'Cliente',
                 'Dirección',
+                'Comuna', // Nueva columna para la comuna
+                'Región', // Nueva columna para la región
                 'Fecha del Pedido',
                 'Orden de Compra',
                 'Estado',
+                'Costo_envio',
+                'Código del Producto',
                 'Producto',
                 'Cantidad',
                 'Precio Neto'
@@ -146,16 +161,23 @@ class PedidoController extends Controller
             foreach ($pedidos as $pedido) {
                 // Para cada pedido, recorrer sus ítems
                 foreach ($pedido->items as $item) {
+                    $costoEnvioFormat = '$' . number_format($pedido->costo_envio, 0, ',', '.');
+                    $precioNetoFormat = '$' . number_format($item->precio_neto, 0, ',', '.');
+
                     fputcsv($file, [
                         $pedido->id,
                         $pedido->cliente->nombre,
                         $pedido->direccion->direccion,
+                        $pedido->direccion->ubicacion->comuna, // Accede a la comuna
+                        $pedido->direccion->ubicacion->region, // Accede a la región
                         $pedido->fecha_pedido,
                         $pedido->orden_compra,
                         $pedido->status,
-                        $item->producto->nombre, // Asegúrate de que el modelo 'Producto' tenga un atributo 'nombre'
+                        $costoEnvioFormat,
+                        $item->producto->codigo_sku,
+                        $item->producto->nombre,
                         $item->cantidad,
-                        $item->precio_neto,
+                        $precioNetoFormat,
                     ]);
                 }
             }
@@ -167,6 +189,13 @@ class PedidoController extends Controller
     }
 
 
+    public function descargarPdf($pedidoId)
+    {
+        $pedido = Pedido::findOrFail($pedidoId);
+        $pdf = PDF::loadView('pedidos.pdf', compact('pedido'));
+
+        return $pdf->download('pedido-' . $pedidoId . '.pdf');
+    }
 
 
 

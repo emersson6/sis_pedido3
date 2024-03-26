@@ -6,7 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class ItemPedido extends Model
 {
-    protected $fillable = ['pedido_id', 'producto_id', 'cantidad', 'precio_neto', 'subtotal'];
+    protected $fillable = [
+        'pedido_id',
+        'producto_id',
+        'cantidad',
+        'precio_neto',
+        'subtotal',
+        'indicaciones',
+    ];
 
     protected $table = 'item_pedidos'; // Asegúrate de que coincida con el nombre de tu tabla
 

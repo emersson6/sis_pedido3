@@ -23,8 +23,19 @@ class Pedido extends Model
         return $this->belongsTo(Direccion::class);
     }
 
+    public function ubicacion()
+    {
+        return $this->belongsTo(ubicacion::class);
+    }
+
     public function items()
     {
         return $this->hasMany(ItemPedido::class);
     }
+    public function fcomPedido()
+    {
+        return $this->hasOne(FcomPedido::class);
+    }
+
+
 }

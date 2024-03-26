@@ -54,11 +54,22 @@
                         <select class="form-control" id="tipo_cliente" name="tipo_cliente">
                             <option value="interno">Interno</option>
                             <option value="externo">Externo</option>
+
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="canal_venta">Canal de Venta:</label>
-                        <input type="text" class="form-control" id="canal_venta" name="canal_venta">
+                        <select class="form-control" id="canal_venta" name="canal_venta">
+                            <option value="Tradicional Santiago">Tradicional Santiago</option>
+                            <option value="Venta Directa">Venta Directa</option>
+                            <option value="E-Commerce">E-Commerce</option>
+                            <option value="Tiendas Especializada">Tiendas Especializada</option>
+                            <option value="Venta al detalle">Venta al detalle</option>
+                            <option value="Tradicional Regiones">Tradicional Regiones</option>
+                            <option value="Supermercados">Supermercados</option>
+                            <option value="Foodservice">Foodservice</option>
+                            <option value="Distribuidores">Distribuidores</option>
+                        </select>
                     </div>
                 </div>
             </div>
